@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Entrar | Meu Desempenho de Estudos</title>
+<meta name="description" content="Entre na sua conta e acompanhe seu desempenho nas aulas, questões e estudos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: cartão de vidro centralizado sobre fundo em malha de gradientes, com a matemática do app flutuando nas laterais */
+:root{
+  color-scheme:light;
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;
+  --font-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --base:#f3f5ff;
+  --mesh-a:#c7d0ff;--mesh-b:#b7ecff;--mesh-c:#e2d3ff;
+  --grid-line:rgba(60,72,170,.09);
+  --glass:rgba(255,255,255,.64);--glass-edge:rgba(255,255,255,.85);
+  --shadow:0 30px 80px -20px rgba(40,52,150,.28),0 2px 6px rgba(40,52,150,.06);
+  --text:#12163a;--muted:#565c86;
+  --field:rgba(255,255,255,.78);--field-edge:rgba(58,70,160,.2);
+  --accent:#4a4ae8;--accent-2:#2a8cff;--on-accent:#fff;
+  --focus:rgba(74,74,232,.28);
+  --good:#0c8a5a;--good-bg:rgba(14,160,104,.12);
+  --bad:#c42a4a;--bad-bg:rgba(220,50,80,.1);
+  --chip:rgba(255,255,255,.7);--chip-edge:rgba(255,255,255,.9);
+}
+@media (prefers-color-scheme:dark){:root{
+  color-scheme:dark;
+  --base:#070b22;
+  --mesh-a:#2c32a8;--mesh-b:#0a6c93;--mesh-c:#5a2aa6;
+  --grid-line:rgba(150,165,255,.08);
+  --glass:rgba(16,20,58,.58);--glass-edge:rgba(255,255,255,.13);
+  --shadow:0 30px 90px -20px rgba(0,0,0,.65),0 2px 6px rgba(0,0,0,.3);
+  --text:#eef0ff;--muted:#a3abd8;
+  --field:rgba(8,12,40,.55);--field-edge:rgba(160,172,255,.22);
+  --accent:#7c7cff;--accent-2:#37a6ff;--on-accent:#070b22;
+  --focus:rgba(124,124,255,.35);
+  --good:#4fe0a2;--good-bg:rgba(60,220,150,.14);
+  --bad:#ff8aa0;--bad-bg:rgba(255,100,130,.14);
+  --chip:rgba(20,26,72,.6);--chip-edge:rgba(255,255,255,.12);
+}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;font-family:var(--font-body);font-size:16px;line-height:1.5;color:var(--text);background:var(--base);-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+h1,h2{margin:0;font-family:var(--font-display);letter-spacing:-.02em;text-wrap:balance}
+p{margin:0}
+
+/* ---- fundo ---- */
+.bg{position:fixed;inset:0;overflow:hidden;z-index:0;
+  background:
+    radial-gradient(60% 55% at 12% 8%,var(--mesh-a) 0,transparent 70%),
+    radial-gradient(50% 50% at 92% 14%,var(--mesh-b) 0,transparent 70%),
+    radial-gradient(60% 60% at 75% 100%,var(--mesh-c) 0,transparent 70%),
+    var(--base)}
+.grid{position:absolute;inset:0;
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:44px 44px;
+  -webkit-mask-image:radial-gradient(70% 70% at 50% 45%,#000 20%,transparent 80%);
+  mask-image:radial-gradient(70% 70% at 50% 45%,#000 20%,transparent 80%)}
+.chip{position:absolute;display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:18px;
+  background:var(--chip);border:1px solid var(--chip-edge);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 14px 40px -16px rgba(30,40,130,.35);
+  font-size:.82rem;color:var(--muted);animation:drift 11s ease-in-out infinite}
+.chip b{display:block;color:var(--text);font-family:var(--font-display);font-size:1.05rem;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.chip svg{width:22px;height:22px;flex:none}
+.c1{left:max(3vw,16px);top:14%;animation-delay:-2s}
+.c2{right:max(3vw,16px);top:11%;animation-delay:-6s}
+.c3{left:max(5vw,16px);bottom:13%;animation-delay:-4s}
+.c4{right:max(4vw,16px);bottom:16%;animation-delay:-8s}
+.c5{left:50%;top:3.5%;translate:-50% 0;animation:none;font-family:var(--font-display);font-size:.9rem;padding:8px 14px;border-radius:99px}
+.ring{width:44px;height:44px;flex:none}
+.ring circle{fill:none;stroke-width:5}
+.ring .tr{stroke:var(--grid-line)}
+.ring .pg{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:90.5 113;transform:rotate(-90deg);transform-origin:center}
+.bars{display:flex;gap:4px;align-items:flex-end;height:34px}
+.bars i{width:7px;border-radius:3px;background:linear-gradient(var(--accent-2),var(--accent));display:block}
+@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@media (max-width:1100px){.c3,.c4{display:none}}
+@media (max-width:820px){.c1,.c2,.c5{display:none}}
+@media (max-height:920px){.c5{display:none}}
+
+/* ---- palco e cartão ---- */
+.stage{position:relative;z-index:1;min-height:100%;display:grid;place-items:center;
+  padding-block:calc(28px + env(safe-area-inset-top,0px)) calc(28px + env(safe-area-inset-bottom,0px));
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.card{width:100%;max-width:448px;padding:34px 32px 26px;border-radius:30px;
+  background:var(--glass);border:1px solid var(--glass-edge);
+  -webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);
+  box-shadow:var(--shadow);animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+@media (max-width:480px){.card{padding:26px 20px 22px;border-radius:26px}}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;font-size:.98rem;margin-bottom:24px;color:var(--text)}
+.logo{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;color:var(--on-accent);
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 8px 20px -8px var(--accent)}
+.logo svg{width:21px;height:21px}
+.view{animation:swap .35s ease both}
+@keyframes swap{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:clamp(1.65rem,5.2vw,2rem);line-height:1.12}
+.sub{color:var(--muted);margin:8px 0 24px;max-width:36ch}
+
+/* ---- campos ---- */
+.field{margin-bottom:16px}
+label,.lbl{display:block;font-size:.88rem;font-weight:600;margin-bottom:7px}
+.control{position:relative;display:flex;align-items:center;border-radius:14px;background:var(--field);border:1.5px solid var(--field-edge);transition:border-color .18s,box-shadow .18s,background .18s}
+.control:hover{border-color:var(--accent)}
+.control:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px var(--focus)}
+.invalid .control{border-color:var(--bad)}
+.invalid .control:focus-within{box-shadow:0 0 0 4px var(--bad-bg)}
+.ico{display:grid;place-items:center;width:44px;flex:none;color:var(--muted)}
+.ico svg{width:19px;height:19px}
+.control:focus-within .ico{color:var(--accent)}
+input{width:100%;min-width:0;height:50px;padding:0 14px 0 0;border:0;background:transparent;outline:none;font-size:1rem}
+input::placeholder{color:color-mix(in srgb,var(--muted) 70%,transparent)}
+.eye{flex:none;width:46px;height:50px;border:0;background:none;color:var(--muted);cursor:pointer;display:grid;place-items:center;border-radius:0 12px 12px 0;transition:color .15s}
+.eye:hover{color:var(--accent)}
+.eye:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.eye svg{width:19px;height:19px}
+.err{min-height:0;font-size:.82rem;color:var(--bad);margin-top:6px}
+.err:empty{display:none}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:-4px 0 20px;flex-wrap:wrap}
+.hint{font-size:.85rem;color:var(--muted)}
+a,.linkbtn{color:var(--accent);font-weight:600;text-decoration:none;background:none;border:0;padding:0;cursor:pointer;border-radius:6px;transition:opacity .15s}
+a:hover,.linkbtn:hover{text-decoration:underline;text-underline-offset:3px}
+a:focus-visible,.linkbtn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* ---- botão ---- */
+.btn{position:relative;width:100%;height:52px;border:0;border-radius:15px;cursor:pointer;font-weight:700;font-size:1rem;color:var(--on-accent);
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  box-shadow:0 14px 28px -12px var(--accent);transition:transform .15s,box-shadow .2s,filter .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 18px 32px -12px var(--accent);filter:brightness(1.05)}
+.btn:active{transform:translateY(0) scale(.985)}
+.btn:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.btn.ghost{background:var(--field);color:var(--text);border:1.5px solid var(--field-edge);box-shadow:none}
+.btn.ghost:hover{border-color:var(--accent);box-shadow:none;filter:none}
+.btn[disabled]{cursor:progress;filter:saturate(.7);transform:none}
+.btn .spin{display:none;position:absolute;inset:0;margin:auto;width:22px;height:22px;border-radius:50%;border:3px solid color-mix(in srgb,var(--on-accent) 35%,transparent);border-top-color:var(--on-accent);animation:spin .7s linear infinite}
+.btn.loading .label{opacity:0}
+.btn.loading .spin{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn.ghost .spin{border-color:color-mix(in srgb,var(--text) 25%,transparent);border-top-color:var(--text)}
+.switch{text-align:center;margin-top:20px;color:var(--muted);font-size:.95rem}
+.foot{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:22px;padding-top:18px;border-top:1px solid var(--field-edge);font-size:.8rem;color:var(--muted)}
+.foot svg{width:15px;height:15px;flex:none}
+
+/* ---- avisos ---- */
+.alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;margin-bottom:18px;font-size:.92rem;background:var(--bad-bg);color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 30%,transparent);animation:swap .25s ease both}
+.alert.ok{background:var(--good-bg);color:var(--good);border-color:color-mix(in srgb,var(--good) 30%,transparent)}
+.alert svg{width:19px;height:19px;flex:none;margin-top:1px}
+.alert p{color:inherit}
+.alert .linkbtn{color:inherit;text-decoration:underline;text-underline-offset:3px;margin-top:4px}
+.notice{padding:12px 14px;border-radius:14px;margin-bottom:18px;font-size:.9rem;background:var(--field);border:1.5px dashed var(--accent)}
+.notice code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em;color:var(--accent)}
+
+/* ---- senha: força e requisitos ---- */
+.meter{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:10px}
+.meter i{height:5px;border-radius:4px;background:var(--field-edge);transition:background .25s}
+.meter[data-s="1"] i:nth-child(-n+1){background:var(--bad)}
+.meter[data-s="2"] i:nth-child(-n+2){background:#e3a21a}
+.meter[data-s="3"] i:nth-child(-n+3){background:#3aa6ff}
+.meter[data-s="4"] i{background:var(--good)}
+.rules{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.8rem;color:var(--muted)}
+.rules li{display:flex;gap:5px;align-items:center}
+.rules li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--field-edge);transition:background .2s}
+.rules li.met{color:var(--good)}
+.rules li.met::before{background:var(--good)}
+.meter-l{font-size:.8rem;color:var(--muted);margin-top:6px}
+
+/* ---- estado "verifique seu e-mail" ---- */
+.mailbig{display:grid;place-items:center;width:64px;height:64px;border-radius:20px;margin-bottom:18px;color:var(--accent);background:var(--field);border:1.5px solid var(--field-edge)}
+.mailbig svg{width:30px;height:30px}
+.back{display:inline-flex;gap:6px;align-items:center;margin-bottom:18px;font-size:.9rem}
+.back svg{width:16px;height:16px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true">
+  <div class="grid"></div>
+  <div class="chip c5">aproveitamento = acertos ÷ questões × 100</div>
+  <div class="chip c1">
+    <svg class="ring" viewBox="0 0 44 44"><circle class="tr" cx="22" cy="22" r="18"/><circle class="pg" cx="22" cy="22" r="18"/></svg>
+    <div><b>80%</b>40 acertos em 50 questões</div>
+  </div>
+  <div class="chip c2">
+    <div class="bars"><i style="height:45%"></i><i style="height:70%"></i><i style="height:55%"></i><i style="height:90%"></i><i style="height:65%"></i><i style="height:30%"></i><i style="height:80%"></i></div>
+    <div><b>12h30</b>estudadas na semana</div>
+  </div>
+  <div class="chip c3">
+    <span data-ic="calendar" style="color:var(--accent)"></span>
+    <div><b>2 aulas hoje</b>Dias anteriores ficam bloqueados</div>
+  </div>
+  <div class="chip c4">
+    <span data-ic="book" style="color:var(--accent-2)"></span>
+    <div><b>Anotações</b>Pesquise por matéria e data</div>
+  </div>
+</div>
+
+<main class="stage">
+  <section class="card" aria-labelledby="t-login">
+    <header class="brand"><span class="logo" data-ic="book"></span><span>Meu Desempenho de Estudos</span></header>
+
+    <div class="notice" id="setup" hidden>
+      <b>Contas neste aparelho.</b> As contas e os dados ficam salvos só neste navegador, e a senha não pode ser recuperada por e-mail. Para guardar tudo online, preencha o <code>config.js</code> com o seu Supabase.
+    </div>
+
+    <div class="alert" id="alert" role="alert" hidden>
+      <span data-ic="alert" id="alert-ic"></span>
+      <div><p id="alert-t"></p><button type="button" class="linkbtn" id="alert-a" hidden></button></div>
+    </div>
+
+    <!-- Entrar -->
+    <form class="view" id="f-login" novalidate>
+      <h1 id="t-login">Bem-vindo de volta!</h1>
+      <p class="sub">Entre na sua conta e continue sua evolução nos estudos.</p>
+      <div class="field">
+        <label for="l-email">E-mail</label>
+        <div class="control"><span class="ico" data-ic="mail"></span><input id="l-email" type="email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="nome@exemplo.com" aria-describedby="l-email-e"></div>
+        <p class="err" id="l-email-e"></p>
+      </div>
+      <div class="field">
+        <label for="l-pass">Senha</label>
+        <div class="control"><span class="ico" data-ic="lock"></span><input id="l-pass" type="password" autocomplete="current-password" placeholder="Sua senha" aria-describedby="l-pass-e"><button type="button" class="eye" data-eye="l-pass" aria-label="Mostrar senha" aria-pressed="false"></button></div>
+        <p class="err" id="l-pass-e"></p>
+      </div>
+      <div class="row"><span></span><button type="button" class="linkbtn" data-go="forgot">Esqueci minha senha</button></div>
+      <button class="btn" type="submit"><span class="label">Entrar</span><span class="spin" aria-hidden="true"></span></button>
+      <p class="switch">Não tem uma conta? <button type="button" class="linkbtn" data-go="signup">Criar conta</button></p>
+      <p class="switch" id="import-wrap" hidden>Já tem conta em outro aparelho? <button type="button" class="linkbtn" id="import-btn">Importar conta</button>
+        <input type="file" id="import-file" accept=".json,application/json" hidden></p>
+    </form>
+
+    <!-- Criar conta -->
+    <form class="view" id="f-signup" novalidate hidden>
+      <h1 id="t-signup">Crie sua conta</h1>
+      <p class="sub">Suas aulas, questões e anotações ficam salvas na sua conta e só você enxerga.</p>
+      <div class="field">
+        <label for="s-name">Nome completo</label>
+        <div class="control"><span class="ico" data-ic="user"></span><input id="s-name" type="text" autocomplete="name" maxlength="80" placeholder="Maria da Silva" aria-describedby="s-name-e"></div>
+        <p class="err" id="s-name-e"></p>
+      </div>
+      <div class="field">
+        <label for="s-email">E-mail</label>
+        <div class="control"><span class="ico" data-ic="mail"></span><input id="s-email" type="email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="nome@exemplo.com" aria-describedby="s-email-e"></div>
+        <p class="err" id="s-email-e"></p>
+      </div>
+      <div class="field">
+        <label for="s-pass">Senha</label>
+        <div class="control"><span class="ico" data-ic="lock"></span><input id="s-pass" type="password" autocomplete="new-password" placeholder="Crie uma senha" aria-describedby="s-pass-e s-rules"><button type="button" class="eye" data-eye="s-pass" aria-label="Mostrar senha" aria-pressed="false"></button></div>
+        <div class="meter" id="s-meter" data-s="0" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <ul class="rules" id="s-rules"><li data-r="len">8 ou mais caracteres</li><li data-r="letter">Uma letra</li><li data-r="num">Um número</li></ul>
+        <p class="err" id="s-pass-e"></p>
+      </div>
+      <div class="field">
+        <label for="s-pass2">Confirmar senha</label>
+        <div class="control"><span class="ico" data-ic="lock"></span><input id="s-pass2" type="password" autocomplete="new-password" placeholder="Repita a senha" aria-describedby="s-pass2-e"><button type="button" class="eye" data-eye="s-pass2" aria-label="Mostrar senha" aria-pressed="false"></button></div>
+        <p class="err" id="s-pass2-e"></p>
+      </div>
+      <button class="btn" type="submit"><span class="label">Criar conta</span><span class="spin" aria-hidden="true"></span></button>
+      <p class="switch">Já tem uma conta? <button type="button" class="linkbtn" data-go="login">Entrar</button></p>
+    </form>
+
+    <!-- Esqueci a senha -->
+    <form class="view" id="f-forgot" novalidate hidden>
+      <button type="button" class="linkbtn back" data-go="login"><span data-ic="arrowleft"></span>Voltar para o login</button>
+      <h1 id="t-forgot">Recuperar senha</h1>
+      <p class="sub">Digite o e-mail da sua conta. Enviaremos um link para você criar uma nova senha.</p>
+      <div class="field">
+        <label for="r-email">E-mail</label>
+        <div class="control"><span class="ico" data-ic="mail"></span><input id="r-email" type="email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="nome@exemplo.com" aria-describedby="r-email-e"></div>
+        <p class="err" id="r-email-e"></p>
+      </div>
+      <button class="btn" type="submit"><span class="label">Enviar link de recuperação</span><span class="spin" aria-hidden="true"></span></button>
+    </form>
+
+    <!-- Nova senha (abre pelo link do e-mail) -->
+    <form class="view" id="f-reset" novalidate hidden>
+      <h1 id="t-reset">Crie uma nova senha</h1>
+      <p class="sub">Escolha uma senha que você ainda não usa em outros sites.</p>
+      <div class="field">
+        <label for="n-pass">Nova senha</label>
+        <div class="control"><span class="ico" data-ic="lock"></span><input id="n-pass" type="password" autocomplete="new-password" placeholder="Nova senha" aria-describedby="n-pass-e n-rules"><button type="button" class="eye" data-eye="n-pass" aria-label="Mostrar senha" aria-pressed="false"></button></div>
+        <div class="meter" id="n-meter" data-s="0" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <ul class="rules" id="n-rules"><li data-r="len">8 ou mais caracteres</li><li data-r="letter">Uma letra</li><li data-r="num">Um número</li></ul>
+        <p class="err" id="n-pass-e"></p>
+      </div>
+      <div class="field">
+        <label for="n-pass2">Confirmar nova senha</label>
+        <div class="control"><span class="ico" data-ic="lock"></span><input id="n-pass2" type="password" autocomplete="new-password" placeholder="Repita a senha" aria-describedby="n-pass2-e"><button type="button" class="eye" data-eye="n-pass2" aria-label="Mostrar senha" aria-pressed="false"></button></div>
+        <p class="err" id="n-pass2-e"></p>
+      </div>
+      <button class="btn" type="submit"><span class="label">Salvar nova senha</span><span class="spin" aria-hidden="true"></span></button>
+    </form>
+
+    <!-- Verifique seu e-mail -->
+    <div class="view" id="v-check" hidden>
+      <div class="mailbig" data-ic="mailcheck"></div>
+      <h1 id="t-check">Verifique seu e-mail</h1>
+      <p class="sub" id="check-text"></p>
+      <button class="btn ghost" type="button" id="check-resend"><span class="label">Reenviar e-mail</span><span class="spin" aria-hidden="true"></span></button>
+      <p class="switch"><button type="button" class="linkbtn" data-go="login">Voltar para o login</button></p>
+    </div>
+
+    <p class="foot"><span data-ic="shield"></span>Cada conta tem os próprios dados, privados e separados.</p>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="store.js"></script>
+<script>
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+/* ---------- ícones ---------- */
+const ICONS={
+  book:'<path d="M4 19V5a2 2 0 0 1 2-2h13v14H6a2 2 0 0 0-2 2zm0 0a2 2 0 0 0 2 2h13"/><path d="M9 8h6"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/>',
+  mailcheck:'<path d="M21 12.5V7a2.5 2.5 0 0 0-2.5-2.5h-13A2.5 2.5 0 0 0 3 7v10a2.5 2.5 0 0 0 2.5 2.5H13"/><path d="m3.5 7 8.5 6 8.5-6"/><path d="m16 18.5 2 2 3.5-4"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  eye:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff:'<path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.5 6.6A17 17 0 0 0 2 12s3.6 7 10 7a9.8 9.8 0 0 0 4.2-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  alert:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/>',
+  check:'<circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.7 2.7L16 9.5"/>',
+  shield:'<path d="M12 3 5 6v5.5c0 4.4 2.9 8.2 7 9.5 4.1-1.3 7-5.1 7-9.5V6z"/><path d="m9 12 2.2 2.2L15 10.4"/>',
+  calendar:'<rect x="3" y="4" width="18" height="17" rx="2.5"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  arrowleft:'<path d="M19 12H5M11 6l-6 6 6 6"/>'
+};
+const ic=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
+$$('[data-ic]').forEach(el=>{el.innerHTML=ic(el.dataset.ic)});
+$$('[data-eye]').forEach(b=>{b.innerHTML=ic('eye')});
+
+/* ---------- configuração e cliente ---------- */
+const RECOVERY=/type=recovery/.test(location.hash);
+const BASE=location.href.replace(/[?#].*$/,'').replace(/[^/]*$/,'');
+const DESTINO='painel.html';
+
+/* ---------- vistas ---------- */
+const VIEWS={login:'#f-login',signup:'#f-signup',forgot:'#f-forgot',reset:'#f-reset',check:'#v-check'};
+const FOCUS={login:'#l-email',signup:'#s-name',forgot:'#r-email',reset:'#n-pass'};
+const TITLES={login:'Entrar',signup:'Criar conta',forgot:'Recuperar senha',reset:'Nova senha',check:'Verifique seu e-mail'};
+function show(name,opts={}){
+  Object.entries(VIEWS).forEach(([k,sel])=>{$(sel).hidden=k!==name});
+  if(!opts.keepAlert)clearAlert();
+  $$('.field.invalid').forEach(f=>f.classList.remove('invalid'));
+  $$('.err').forEach(e=>{e.textContent=''});
+  document.title=TITLES[name]+' | Meu Desempenho de Estudos';
+  const f=FOCUS[name];if(f&&!opts.noFocus)setTimeout(()=>{const el=$(f);if(el)el.focus({preventScroll:true})},60);
+}
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');
+  if(g){
+    const from=g.dataset.go;
+    show(from);
+    if(from==='forgot'&&!$('#r-email').value)$('#r-email').value=$('#l-email').value;
+    return;
+  }
+  const eye=e.target.closest('[data-eye]');
+  if(eye){
+    const inp=$('#'+eye.dataset.eye),on=inp.type==='password';
+    inp.type=on?'text':'password';
+    eye.innerHTML=ic(on?'eyeoff':'eye');
+    eye.setAttribute('aria-pressed',String(on));
+    eye.setAttribute('aria-label',on?'Ocultar senha':'Mostrar senha');
+    inp.focus();
+  }
+});
+
+/* ---------- avisos e erros ---------- */
+function showAlert(msg,o={}){
+  const box=$('#alert');
+  box.className='alert'+(o.ok?' ok':'');
+  $('#alert-ic').innerHTML=ic(o.ok?'check':'alert');
+  $('#alert-t').textContent=msg;
+  const a=$('#alert-a');
+  if(o.action){a.hidden=false;a.textContent=o.action.label;a.onclick=o.action.fn}else{a.hidden=true;a.onclick=null}
+  box.hidden=false;
+}
+function clearAlert(){$('#alert').hidden=true}
+function setErr(id,msg){
+  const inp=$('#'+id),wrap=inp.closest('.field'),e=$('#'+id+'-e');
+  e.textContent=msg||'';
+  wrap.classList.toggle('invalid',!!msg);
+  inp.setAttribute('aria-invalid',msg?'true':'false');
+  return !msg;
+}
+function setLoading(form,on){
+  const b=$('.btn',form)||form;
+  b.disabled=on;b.classList.toggle('loading',on);b.setAttribute('aria-busy',String(on));
+  $$('input',form).forEach(i=>{i.readOnly=on});
+}
+function firstInvalid(form){const el=$('.field.invalid input',form);if(el)el.focus()}
+
+/* ---------- validações ---------- */
+const EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const vEmail=(id)=>{const v=$('#'+id).value.trim();
+  if(!v)return setErr(id,'Digite seu e-mail.');
+  if(!EMAIL.test(v))return setErr(id,'Esse e-mail parece incompleto. Use o formato nome@exemplo.com.');
+  return setErr(id,'')};
+function checks(p){return{len:p.length>=8,letter:/[A-Za-zÀ-ÿ]/.test(p),num:/\d/.test(p)}}
+function strength(p){
+  if(!p)return 0;const c=checks(p);
+  let s=0;if(c.len)s++;if(c.letter&&c.num)s++;if(p.length>=12)s++;if(/[^A-Za-z0-9]/.test(p)&&/[A-Z]/.test(p)&&/[a-z]/.test(p))s++;
+  return Math.max(1,Math.min(4,s));
+}
+function bindMeter(inputId,meterId,rulesId){
+  $('#'+inputId).addEventListener('input',e=>{
+    const p=e.target.value,c=checks(p);
+    $('#'+meterId).dataset.s=String(strength(p));
+    $$('#'+rulesId+' li').forEach(li=>li.classList.toggle('met',!!c[li.dataset.r]));
+  });
+}
+bindMeter('s-pass','s-meter','s-rules');
+bindMeter('n-pass','n-meter','n-rules');
+function vNewPass(pid,cid){
+  const p=$('#'+pid).value,c=$('#'+cid).value,k=checks(p);let ok=true;
+  if(!p)ok=setErr(pid,'Crie uma senha.')&&ok;
+  else if(!k.len)ok=setErr(pid,'A senha precisa ter pelo menos 8 caracteres.')&&ok;
+  else if(!k.letter||!k.num)ok=setErr(pid,'Use pelo menos uma letra e um número.')&&ok;
+  else setErr(pid,'');
+  if(!c)ok=setErr(cid,'Repita a senha para confirmar.')&&ok;
+  else if(c!==p)ok=setErr(cid,'As senhas não são iguais.')&&ok;
+  else setErr(cid,'');
+  return ok;
+}
+['l-email','s-email','r-email'].forEach(id=>$('#'+id).addEventListener('blur',()=>{if($('#'+id).value)vEmail(id)}));
+$('#s-pass2').addEventListener('blur',()=>{if($('#s-pass2').value&&$('#s-pass2').value!==$('#s-pass').value)setErr('s-pass2','As senhas não são iguais.')});
+
+/* ---------- mensagens de erro do Supabase ---------- */
+const net=e=>/fetch|network|failed/i.test(String(e&&e.message))&&!(e&&e.status);
+function authMessage(err,ctx){
+  const m=String(err&&err.message||''),code=err&&err.code,st=err&&err.status;
+  if(code==='local_no_reset'||code==='no_crypto'||code==='storage')return m;
+  if(net(err))return'Não foi possível conectar. Verifique sua internet e tente de novo.';
+  if(st===429||/rate limit|too many/i.test(m)||code==='over_request_rate_limit'||code==='over_email_send_rate_limit')return'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente de novo.';
+  if(code==='invalid_credentials'||/invalid login credentials/i.test(m))return'E-mail ou senha incorretos. Confira os dados e tente de novo.';
+  if(code==='email_not_confirmed'||/not confirmed/i.test(m))return'Seu e-mail ainda não foi confirmado. Abra o link que enviamos ou peça um novo.';
+  if(code==='user_already_exists'||/already registered|already been registered/i.test(m))return'Já existe uma conta com este e-mail. Entre ou recupere sua senha.';
+  if(code==='weak_password'||/password.*(weak|short|least)/i.test(m))return'Essa senha é fraca demais. Use 8 ou mais caracteres, com letras e números.';
+  if(code==='same_password'||/different from the old/i.test(m))return'A nova senha precisa ser diferente da atual.';
+  if(/session|jwt|token/i.test(m)&&ctx==='reset')return'O link expirou ou já foi usado. Peça um novo link de recuperação.';
+  if(/signups? (not allowed|are disabled)/i.test(m))return'O cadastro de novas contas está desativado neste projeto.';
+  return ctx==='login'?'Não foi possível entrar agora. Tente de novo em instantes.':'Algo deu errado. Tente de novo em instantes.';
+}
+
+/* ---------- entrar ---------- */
+$('#f-login').addEventListener('submit',async e=>{
+  e.preventDefault();clearAlert();
+  const f=e.currentTarget,pass=$('#l-pass').value;
+  let ok=vEmail('l-email');
+  ok=(pass?setErr('l-pass',''):setErr('l-pass','Digite sua senha.'))&&ok;
+  if(!ok)return firstInvalid(f);
+  if(!Auth)return showAlert('Não foi possível iniciar o serviço de contas. Recarregue a página.');
+  const email=$('#l-email').value.trim().toLowerCase();
+  setLoading(f,true);
+  try{
+    const {error}=await Auth.signInWithPassword({email,password:pass});
+    if(error){
+      const msg=authMessage(error,'login');
+      const unconfirmed=error.code==='email_not_confirmed'||/not confirmed/i.test(error.message||'');
+      showAlert(msg,unconfirmed?{action:{label:'Reenviar e-mail de confirmação',fn:()=>resendSignup(email)}}:{});
+      if(error.code==='invalid_credentials'||/invalid login/i.test(error.message||''))$('#l-pass').select();
+      return;
+    }
+    showAlert('Login feito. Abrindo seu painel…',{ok:true});
+    location.replace(DESTINO);
+  }catch(err){showAlert(authMessage(err,'login'))}
+  finally{setLoading(f,false)}
+});
+
+/* ---------- criar conta ---------- */
+$('#f-signup').addEventListener('submit',async e=>{
+  e.preventDefault();clearAlert();
+  const f=e.currentTarget,name=$('#s-name').value.trim().replace(/\s+/g,' ');
+  let ok=true;
+  const parts=name.split(' ').filter(Boolean);
+  if(!name)ok=setErr('s-name','Digite seu nome completo.')&&ok;
+  else if(parts.length<2||name.length<5)ok=setErr('s-name','Digite nome e sobrenome.')&&ok;
+  else setErr('s-name','');
+  ok=vEmail('s-email')&&ok;
+  ok=vNewPass('s-pass','s-pass2')&&ok;
+  if(!ok)return firstInvalid(f);
+  if(!Auth)return showAlert('Não foi possível iniciar o serviço de contas. Recarregue a página.');
+  const email=$('#s-email').value.trim().toLowerCase(),pass=$('#s-pass').value;
+  setLoading(f,true);
+  try{
+    const {data,error}=await Auth.signUp({email,password:pass,options:{data:{full_name:name},emailRedirectTo:BASE+'index.html'}});
+    if(error){
+      const msg=authMessage(error,'signup');
+      showAlert(msg,error.code==='user_already_exists'||/already/i.test(error.message||'')?{action:{label:'Ir para o login',fn:()=>{$('#l-email').value=email;show('login')}}}:{});
+      return;
+    }
+    const existing=data.user&&Array.isArray(data.user.identities)&&data.user.identities.length===0;
+    if(existing){
+      showAlert(authMessage({code:'user_already_exists'},'signup'),{action:{label:'Ir para o login',fn:()=>{$('#l-email').value=email;show('login')}}});
+      return;
+    }
+    if(data.session){location.replace(DESTINO);return}
+    showCheck({
+      text:'Enviamos um link de confirmação para '+email+'. Abra o e-mail e clique no link para ativar sua conta. Se não encontrar, olhe também o spam.',
+      resend:()=>resendSignup(email)
+    });
+  }catch(err){showAlert(authMessage(err,'signup'))}
+  finally{setLoading(f,false)}
+});
+
+/* ---------- esqueci a senha ---------- */
+async function sendReset(email){
+  const {error}=await Auth.resetPasswordForEmail(email,{redirectTo:BASE+'index.html'});
+  if(error)throw error;
+}
+$('#f-forgot').addEventListener('submit',async e=>{
+  e.preventDefault();clearAlert();
+  const f=e.currentTarget;
+  if(!vEmail('r-email'))return firstInvalid(f);
+  if(!Auth)return showAlert('Não foi possível iniciar o serviço de contas. Recarregue a página.');
+  const email=$('#r-email').value.trim().toLowerCase();
+  setLoading(f,true);
+  try{
+    await sendReset(email);
+    showCheck({
+      title:'Link enviado',
+      text:'Se existir uma conta com '+email+', você vai receber um e-mail com o link para criar uma nova senha. O link vale por pouco tempo.',
+      resend:()=>sendReset(email)
+    });
+  }catch(err){showAlert(authMessage(err,'forgot'))}
+  finally{setLoading(f,false)}
+});
+
+/* ---------- nova senha ---------- */
+$('#f-reset').addEventListener('submit',async e=>{
+  e.preventDefault();clearAlert();
+  const f=e.currentTarget;
+  if(!vNewPass('n-pass','n-pass2'))return firstInvalid(f);
+  if(!Auth)return;
+  setLoading(f,true);
+  try{
+    const {data:{session}}=await Auth.getSession();
+    if(!session){showAlert('O link expirou ou já foi usado. Peça um novo link de recuperação.',{action:{label:'Pedir novo link',fn:()=>show('forgot')}});return}
+    const {error}=await Auth.updateUser({password:$('#n-pass').value});
+    if(error){showAlert(authMessage(error,'reset'));return}
+    showAlert('Senha alterada. Abrindo seu painel…',{ok:true});
+    setTimeout(()=>location.replace(DESTINO),900);
+  }catch(err){showAlert(authMessage(err,'reset'))}
+  finally{setLoading(f,false)}
+});
+
+/* ---------- tela "verifique seu e-mail" ---------- */
+let cooldownT=null;
+function showCheck({title,text,resend}){
+  $('#t-check').textContent=title||'Verifique seu e-mail';
+  $('#check-text').textContent=text;
+  show('check',{noFocus:true});
+  const b=$('#check-resend');
+  b.onclick=async()=>{
+    b.disabled=true;b.classList.add('loading');
+    try{await resend();showAlert('E-mail reenviado. Pode levar alguns minutos para chegar.',{ok:true});startCooldown(b,45)}
+    catch(err){showAlert(authMessage(err,'resend'));b.disabled=false}
+    finally{b.classList.remove('loading')}
+  };
+  startCooldown(b,30);
+  b.focus({preventScroll:true});
+}
+function startCooldown(b,s){
+  clearInterval(cooldownT);
+  const label=$('.label',b);let left=s;b.disabled=true;
+  const tick=()=>{if(left<=0){clearInterval(cooldownT);b.disabled=false;label.textContent='Reenviar e-mail';return}label.textContent='Reenviar em '+left+'s';left--};
+  tick();cooldownT=setInterval(tick,1000);
+}
+async function resendSignup(email){
+  if(!Auth)return;
+  try{
+    const {error}=await Auth.resend({type:'signup',email,options:{emailRedirectTo:BASE+'index.html'}});
+    if(error)throw error;
+    showAlert('Enviamos um novo e-mail de confirmação para '+email+'.',{ok:true});
+  }catch(err){showAlert(authMessage(err,'resend'))}
+}
+
+/* ---------- importar conta de outro aparelho (modo local) ---------- */
+async function doImport(text,replace){
+  try{
+    const email=Auth.importAccount(text,{replace});
+    $('#l-email').value=email;$('#l-pass').value='';
+    show('login',{noFocus:true});
+    showAlert('Conta importada. Entre com o mesmo e-mail e a mesma senha de antes.',{ok:true});
+    $('#l-pass').focus();
+  }catch(err){
+    if(err.code==='exists')showAlert(err.message,{action:{label:'Substituir pelos dados do arquivo',fn:()=>doImport(text,true)}});
+    else showAlert(err.message||'Não foi possível importar o arquivo.');
+  }
+}
+$('#import-btn').addEventListener('click',()=>$('#import-file').click());
+$('#import-file').addEventListener('change',async e=>{
+  const f=e.target.files[0];e.target.value='';
+  if(!f)return;
+  if(f.size>20*1024*1024)return showAlert('Arquivo grande demais.');
+  doImport(await f.text(),false);
+});
+
+/* ---------- início ---------- */
+(async function start(){
+  const params=new URLSearchParams(location.hash.replace(/^#/,''));
+  if(params.get('error_code')||params.get('error')){
+    const expired=params.get('error_code')==='otp_expired';
+    history.replaceState(null,'',location.pathname);
+    show('login',{noFocus:true});
+    showAlert(expired?'O link do e-mail expirou ou já foi usado. Peça um novo.':'Não foi possível validar o link do e-mail. Tente de novo.');
+  }
+  if(!Auth){showAlert('Não foi possível iniciar o serviço de contas. Recarregue a página.');return}
+  if(window.APP_MODE==='local'){$('#setup').hidden=false;$('#import-wrap').hidden=false}
+  Auth.onAuthStateChange(ev=>{if(ev==='PASSWORD_RECOVERY')show('reset')});
+  if(RECOVERY){show('reset');return}
+  try{
+    const {data:{session}}=await Auth.getSession();
+    if(session){location.replace(DESTINO);return}
+  }catch(e){}
+  const v=new URLSearchParams(location.search).get('view');
+  if(v==='signup')show('signup',{noFocus:true});
+})();
+</script>
+</body>
+</html>
